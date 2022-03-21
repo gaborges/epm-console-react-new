@@ -80,3 +80,8 @@ firebase deploy
 #update
 npm run build
 firebase deploy
+
+#git
+git add * 
+git commit -m "message"
+git push
