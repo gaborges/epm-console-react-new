@@ -13,10 +13,8 @@ function UserList(props) {
         await set(ref(db, 'Users/' + userid), {
             AcademicTitles:user.AcademicTitles,
             Address:user.Address,
-            City:user.City,
             Company:user.Company,
             Course:user.Course,
-            CurrentCountry:user.CurrentCountry,
             Dicas:user.Dicas,
             Email:user.Email,
             Enabled:user.Enabled,
@@ -48,10 +46,8 @@ function UserList(props) {
         await set(ref(db, 'Users/' + userid), {
             AcademicTitles:user.AcademicTitles,
             Address:user.Address,
-            City:user.City,
             Company:user.Company,
             Course:user.Course,
-            CurrentCountry:user.CurrentCountry,
             Dicas:user.Dicas,
             Email:user.Email,
             Enabled:user.Enabled,
@@ -129,8 +125,7 @@ function UserList(props) {
                     item[1].FirstName.toLowerCase().includes(strSearch.toLowerCase()) ||
                     item[1].LastName.toLowerCase().includes(strSearch.toLowerCase()) ||
                     item[1].OENumber.toLowerCase().includes(strSearch.toLowerCase()) ||
-                    item[1].OESpecialization.toLowerCase().includes(strSearch.toLowerCase()) ||
-                    item[1].City.toLowerCase().includes(strSearch.toLowerCase()));
+                    item[1].OESpecialization.toLowerCase().includes(strSearch.toLowerCase()));
             })
 
 
@@ -178,6 +173,9 @@ function UserList(props) {
                         <td ><button id="button-allow" onClick={async()=>{
                             await UpdateUser(user[0],user[1]);
                         }}>Allow</button></td>
+                        <td ><button id="button-delete" onClick={async()=>{
+                            await DeleteUser(user[0],user[1]);
+                        }}>Delete</button></td>
                     </tr>
                 </>
             )}
