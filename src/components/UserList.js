@@ -1,14 +1,24 @@
 import React, {useEffect, useState} from "react";
 import { getDatabase, ref,remove, onValue, get ,child,set, query, orderByChild } from "firebase/database";
-import {database} from "../fire";
+import {auth, database} from "../fire";
+import { getAdditionalUserInfo, onAuthStateChanged, SignInMethod, getAuth, deleteUser } from "firebase/auth";
 
 function UserList(props) {
+    
+    async function IsEmailVerified(email,password){
+        var auth = SignInMethod.EMAIL_PASSWORD(email,password);
+        var content = auth.onAuthStateChanged;
+        if (content.userid.IsEmailVerified == true){
+            return "confirmado"
+        }
+        else return "não confirmado"
+    }
 
     async function UpdateUser(userid,user){
         console.log("update_user_func_enable->" + userid);
 
         user.Enabled = true;
-
+        
         const db = getDatabase();
         await set(ref(db, 'Users/' + userid), {
             AcademicTitles:user.AcademicTitles,
@@ -35,7 +45,9 @@ function UserList(props) {
             PhoneNumber:user.PhoneNumber,
             ProfileURL:user.ProfileURL,
             Subcollege:user.Subcollege,
-            University:user.University
+            University:user.University,
+            RegisterDate:user.RegisterDate,
+            EmailChecked: IsEmailVerified(user.Email,user.Password)
         });
         props.func();
     }
@@ -71,16 +83,26 @@ function UserList(props) {
             PhoneNumber:user.PhoneNumber,
             ProfileURL:user.ProfileURL,
             Subcollege:user.Subcollege,
-            University:user.University
+            University:user.University,
+            RegisterDate:user.RegisterDate,
+            EmailChecked: IsEmailVerified(user.Email,user.Password)
         });
         props.func();
     }
 
-    async function DeleteUser(userid,user){
+    async function DeleteUser(userid,user) {
         console.log("delete_user_func->" + userid);
 
-        const db = getDatabase();
-        await remove(ref(db, 'Users/' + userid));
+        if (window.confirm('Are you sure you wish to delete this item?'))
+        {
+            console.log("Ação deletar: Resgata utilizador")
+            console.log(user)
+
+            const db = getDatabase();
+            await remove(ref(db, 'Users/' + userid));
+        } else {
+            console.log("Cancelar ação")
+        }
         props.func();
     }
 
@@ -123,7 +145,7 @@ function UserList(props) {
 
         let listdata = Object.entries(data);
         console.log("listdata",listdata)
-
+        
         if (strSearch.length)
             listdata = listdata.filter((item)=>{
                 return (
@@ -131,7 +153,8 @@ function UserList(props) {
                     item[1].FirstName.toLowerCase().includes(strSearch.toLowerCase()) ||
                     item[1].LastName.toLowerCase().includes(strSearch.toLowerCase()) ||
                     item[1].OENumber.toLowerCase().includes(strSearch.toLowerCase()) ||
-                    item[1].OESpecialization.toLowerCase().includes(strSearch.toLowerCase()));
+                    item[1].OESpecialization.toLowerCase().includes(strSearch.toLowerCase()) ||
+                    item[1].EmailChecked.toLowerCase().includes(strSearch.toLowerCase()));
             })
 
 
@@ -166,6 +189,8 @@ function UserList(props) {
                 <th>Last Name</th>
                 <th>Email</th>
                 <th>OE Number</th>
+                <th>Register Date</th>
+                <th>Email Confirmation</th>
                 <th id="ngr"></th>
             </tr>
 
@@ -176,6 +201,8 @@ function UserList(props) {
                         <td>{user[1].LastName}</td>
                         <td>{user[1].Email}</td>
                         <td>{user[1].OENumber}</td>
+                        <td>{user[1].RegisterDate}</td>
+                        <td>{user[1].EmailChecked}</td>
                         <td ><button id="button-allow" onClick={async()=>{
                             await UpdateUser(user[0],user[1]);
                         }}>Allow</button></td>
@@ -197,6 +224,7 @@ function UserList(props) {
                     <th>Last Name</th>
                     <th>Email</th>
                     <th>OE Number</th>
+                    <th>RegisterDate</th>
                     <th id="ngr"></th>
                 </tr>
 
@@ -207,6 +235,7 @@ function UserList(props) {
                             <td>{user[1].LastName}</td>
                             <td>{user[1].Email}</td>
                             <td>{user[1].OENumber}</td>
+                            <td>{user[1].RegisterDate}</td>
                             <td ><button id="button-allow" onClick={async()=>{
                                 await UpdateUser_disable(user[0],user[1]);
                             }}>Block</button></td>
