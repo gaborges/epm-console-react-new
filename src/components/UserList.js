@@ -1,14 +1,16 @@
 import React, {useEffect, useState} from "react";
-import { getDatabase, ref,remove, onValue, get ,child,set, query, orderByChild } from "firebase/database";
+import { getDatabase, ref,remove, set} from "firebase/database";
 import {auth, database} from "../fire";
-import { getAdditionalUserInfo, onAuthStateChanged, SignInMethod, getAuth, deleteUser } from "firebase/auth";
+import {SignInMethod } from "firebase/auth";
+
+
 
 function UserList(props) {
-    
+
     async function IsEmailVerified(email,password){
         var auth = SignInMethod.EMAIL_PASSWORD(email,password);
         var content = auth.onAuthStateChanged;
-        if (content.userid.IsEmailVerified == true){
+        if (content.userid.IsEmailVerified === true){
             return "confirmado"
         }
         else return "não confirmado"
@@ -95,13 +97,39 @@ function UserList(props) {
 
         if (window.confirm('Are you sure you wish to delete this item?'))
         {
+
             console.log("Ação deletar: Resgata utilizador")
             console.log(user)
 
-            const db = getDatabase();
-            await remove(ref(db, 'Users/' + userid));
+
+
+            var data = JSON.stringify({
+                'id': userid,
+                'email': user.Email
+            });
+
+            await fetch('http://localhost:5000/delete_user', {
+                method: 'POST',
+                body: data,
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8',
+                },
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    console.log("result data: "+data);
+                    console.log("Pronto, excluído")
+                    //setPosts((posts) => [data, ...posts]);
+                    //setTitle('');
+                    //setBody('');
+                })
+                .catch((err) => {
+                    console.log(err.message);
+                });
+
+            console.log("Teste ação");
         } else {
-            console.log("Cancelar ação")
+            console.log("Cancelar ação");
         }
         props.func();
     }
@@ -178,6 +206,8 @@ function UserList(props) {
 
     return(
         <div>
+
+
             <input placeholder="Search" id="search_input" value={strSearch} onChange={e=>{
                 onStrSearch(e.target.value)
             }}/>
@@ -251,6 +281,7 @@ function UserList(props) {
         }
 
         </div>
+
     );
 }
 

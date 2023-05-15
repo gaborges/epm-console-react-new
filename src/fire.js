@@ -1,8 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, onValue, get ,child,set, query, orderByChild } from "firebase/database";
+import { getDatabase, ref,set } from "firebase/database";
 import { getAuth } from "firebase/auth"
-import {useState} from "react";
+//import {useState} from "react";
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration

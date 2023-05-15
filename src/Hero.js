@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {database} from  "./fire"
-import {child, get, getDatabase, ref, set} from "firebase/database";
+import {child, get, ref} from "firebase/database";
 import UserList from "./components/UserList"
 
 const Hero = ({handleLogout}) => {

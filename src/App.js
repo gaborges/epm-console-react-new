@@ -17,6 +17,7 @@ function App() {
   const [passwordError, setPasswordError] = useState("");
   const [hasAccount, setHasAccount] = useState("");
 
+
   const clearInputs = () => {
     setEmail("");
     setPassword("");
@@ -34,7 +35,7 @@ function App() {
     await signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in
-        user = userCredential.user;
+        //user = userCredential.user;
         // ...
       })
       .catch((err) => {
@@ -57,7 +58,7 @@ function App() {
     await createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in
-        user = userCredential.user;
+        //user = userCredential.user;
         // ...
       })
       .catch((err) => {
@@ -81,6 +82,7 @@ function App() {
       // User is signed in, see docs for a list of available properties
       // https://firebase.google.com/docs/reference/js/firebase.User
       const uid = user.uid;
+      console.log("user changed: "+uid);
       clearInputs();
       setUser(user);
     } else {
