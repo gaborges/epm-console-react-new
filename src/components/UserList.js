@@ -49,7 +49,7 @@ function UserList(props) {
             Subcollege:user.Subcollege,
             University:user.University,
             RegisterDate:user.RegisterDate,
-            EmailChecked: IsEmailVerified(user.Email,user.Password)
+            //EmailChecked: IsEmailVerified(user.Email,user.Password)
         });
         props.func();
     }
@@ -87,7 +87,7 @@ function UserList(props) {
             Subcollege:user.Subcollege,
             University:user.University,
             RegisterDate:user.RegisterDate,
-            EmailChecked: IsEmailVerified(user.Email,user.Password)
+            //EmailChecked: IsEmailVerified(user.Email,user.Password)
         });
         props.func();
     }
@@ -95,7 +95,7 @@ function UserList(props) {
     async function DeleteUser(userid,user) {
         console.log("delete_user_func->" + userid);
 
-        if (window.confirm('Are you sure you wish to delete this item?'))
+        if (window.confirm('Are you sure you wish to delete this item?\n\nWarning: be aware that if you just activated the web service, the first deleted user action takes nearly 1 minute because the firebase must load all libraries and verify the authenticity from the SDK access.'))
         {
 
             console.log("Ação deletar: Resgata utilizador")
@@ -181,8 +181,9 @@ function UserList(props) {
                     item[1].FirstName.toLowerCase().includes(strSearch.toLowerCase()) ||
                     item[1].LastName.toLowerCase().includes(strSearch.toLowerCase()) ||
                     item[1].OENumber.toLowerCase().includes(strSearch.toLowerCase()) ||
-                    item[1].OESpecialization.toLowerCase().includes(strSearch.toLowerCase()) ||
-                    item[1].EmailChecked.toLowerCase().includes(strSearch.toLowerCase()));
+                    item[1].OESpecialization.toLowerCase().includes(strSearch.toLowerCase()) //||
+                    //item[1].EmailChecked.toLowerCase().includes(strSearch.toLowerCase())
+                  );
             })
 
 
@@ -220,7 +221,6 @@ function UserList(props) {
                 <th>Email</th>
                 <th>OE Number</th>
                 <th>Register Date</th>
-                <th>Email Confirmation</th>
                 <th id="ngr"></th>
             </tr>
 
@@ -232,7 +232,6 @@ function UserList(props) {
                         <td>{user[1].Email}</td>
                         <td>{user[1].OENumber}</td>
                         <td>{user[1].RegisterDate}</td>
-                        <td>{user[1].EmailChecked}</td>
                         <td ><button id="button-allow" onClick={async()=>{
                             await UpdateUser(user[0],user[1]);
                         }}>Allow</button></td>

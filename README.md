@@ -71,17 +71,17 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 
 #first time
-npm install -g firebase-tools
-firebase login
-npm run build
-firebase init hosting
-firebase deploy
+- npm install -g firebase-tools
+- firebase login
+- npm run build
+- firebase init hosting
+- firebase deploy
 
 #update
-npm run build
-firebase deploy
+- npm run build
+- firebase deploy
 
 #git
-git add * 
-git commit -m "message"
-git push
+- (when we need to add file) git add * 
+- git commit -m "message"
+- git push
