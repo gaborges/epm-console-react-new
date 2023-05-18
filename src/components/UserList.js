@@ -1,26 +1,17 @@
 import React, {useEffect, useState} from "react";
-import { getDatabase, ref,remove, set} from "firebase/database";
+import { getDatabase, ref,remove, onValue, get ,child,set, query, orderByChild } from "firebase/database";
 import {auth, database} from "../fire";
-import {SignInMethod } from "firebase/auth";
-
-
+import { deleteUser, getAdditionalUserInfo, getAuth, onAuthStateChanged, SignInMethod, signInWithEmailAndPassword, signOut } from "firebase/auth";
 
 function UserList(props) {
 
-    async function IsEmailVerified(email,password){
-        var auth = SignInMethod.EMAIL_PASSWORD(email,password);
-        var content = auth.onAuthStateChanged;
-        if (content.userid.IsEmailVerified === true){
-            return "confirmado"
-        }
-        else return "não confirmado"
-    }
+
 
     async function UpdateUser(userid,user){
         console.log("update_user_func_enable->" + userid);
 
         user.Enabled = true;
-        
+
         const db = getDatabase();
         await set(ref(db, 'Users/' + userid), {
             AcademicTitles:user.AcademicTitles,
@@ -49,7 +40,6 @@ function UserList(props) {
             Subcollege:user.Subcollege,
             University:user.University,
             RegisterDate:user.RegisterDate,
-            //EmailChecked: IsEmailVerified(user.Email,user.Password)
         });
         props.func();
     }
@@ -87,21 +77,22 @@ function UserList(props) {
             Subcollege:user.Subcollege,
             University:user.University,
             RegisterDate:user.RegisterDate,
-            //EmailChecked: IsEmailVerified(user.Email,user.Password)
         });
         props.func();
     }
 
-    async function DeleteUser(userid,user) {
+    async function DeleteUser(userid,user){
         console.log("delete_user_func->" + userid);
-
+        //document.querySelector
         if (window.confirm('Are you sure you wish to delete this item?\n\nWarning: be aware that if you just activated the web service, the first deleted user action takes nearly 1 minute because the firebase must load all libraries and verify the authenticity from the SDK access.'))
         {
-
+            //const loader = document.querySelector('#overlay-background');// if you want to show the loader when React loads data again
+            //const loader = document.getElementById("overlay-background");// if you want to show the loader when React loads data again
+            //const showLoader = () => loader.classList.remove('overlay-background-hide');
+            setEnableLoading(true);
             console.log("Ação deletar: Resgata utilizador")
-            console.log(user)
 
-
+            console.log(user);
 
             var data = JSON.stringify({
                 'id': userid,
@@ -122,9 +113,12 @@ function UserList(props) {
                     //setPosts((posts) => [data, ...posts]);
                     //setTitle('');
                     //setBody('');
+                    //const hideLoader = () => loader.classList.add('overlay-background-hide');
+                    setEnableLoading(false);
                 })
                 .catch((err) => {
                     console.log(err.message);
+                    setEnableLoading(false);
                 });
 
             console.log("Teste ação");
@@ -139,6 +133,7 @@ function UserList(props) {
     const[disabledlist, setdisabledlist] = useState( [])
 
     const[enabledlist, setenabledlist] = useState( [])
+    const[loading, setEnableLoading] = useState( false)
 
 
     useEffect(() => {
@@ -173,7 +168,7 @@ function UserList(props) {
 
         let listdata = Object.entries(data);
         console.log("listdata",listdata)
-        
+
         if (strSearch.length)
             listdata = listdata.filter((item)=>{
                 return (
@@ -181,9 +176,8 @@ function UserList(props) {
                     item[1].FirstName.toLowerCase().includes(strSearch.toLowerCase()) ||
                     item[1].LastName.toLowerCase().includes(strSearch.toLowerCase()) ||
                     item[1].OENumber.toLowerCase().includes(strSearch.toLowerCase()) ||
-                    item[1].OESpecialization.toLowerCase().includes(strSearch.toLowerCase()) //||
-                    //item[1].EmailChecked.toLowerCase().includes(strSearch.toLowerCase())
-                  );
+                    item[1].OESpecialization.toLowerCase().includes(strSearch.toLowerCase()) ||
+                    item[1].EmailChecked.toLowerCase().includes(strSearch.toLowerCase()));
             })
 
 
@@ -207,80 +201,84 @@ function UserList(props) {
 
     return(
         <div>
-
-
-            <input placeholder="Search" id="search_input" value={strSearch} onChange={e=>{
-                onStrSearch(e.target.value)
-            }}/>
-            <h2 id="table_title">Inactive Users</h2>
-        {enabledlist && enabledlist.length ?
-        <table id="bixo-table">
-            <tr>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Email</th>
-                <th>OE Number</th>
-                <th>Register Date</th>
-                <th id="ngr"></th>
-            </tr>
-
-            {enabledlist.map((user) =>
-                <>
-                    <tr>
-                        <td>{user[1].FirstName}</td>
-                        <td>{user[1].LastName}</td>
-                        <td>{user[1].Email}</td>
-                        <td>{user[1].OENumber}</td>
-                        <td>{user[1].RegisterDate}</td>
-                        <td ><button id="button-allow" onClick={async()=>{
-                            await UpdateUser(user[0],user[1]);
-                        }}>Allow</button></td>
-                        <td ><button id="button-delete" onClick={async()=>{
-                            await DeleteUser(user[0],user[1]);
-                        }}>Delete</button></td>
-                    </tr>
-                </>
-            )}
-
-        </table>:
-            <h1 id="no-users">No Users to activate</h1>
-        }
-            <h2 id="table_title">Active Users</h2>
-        {disabledlist && disabledlist.length ?
-            <table id="bixo-table">
-                <tr>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Email</th>
-                    <th>OE Number</th>
-                    <th>RegisterDate</th>
-                    <th id="ngr"></th>
-                </tr>
-
-                {disabledlist.map((user) =>
-                    <>
+            <div id="overlay-background" style={{ display: loading ? 'block' : 'none' }} >
+                <div className="text-loading">
+                    Accessing the server, please wait! It can take one minute
+                </div>
+                <div className="loader"></div>
+            </div>
+            <div style={{ display: !loading ? 'block' : 'none' }}>
+                <input placeholder="Search" id="search_input" value={strSearch} onChange={e=>{
+                    onStrSearch(e.target.value)
+                }}/>
+                <h2 id="table_title">Inactive Users</h2>
+                {enabledlist && enabledlist.length ?
+                    <table id="bixo-table">
                         <tr>
-                            <td>{user[1].FirstName}</td>
-                            <td>{user[1].LastName}</td>
-                            <td>{user[1].Email}</td>
-                            <td>{user[1].OENumber}</td>
-                            <td>{user[1].RegisterDate}</td>
-                            <td ><button id="button-allow" onClick={async()=>{
-                                await UpdateUser_disable(user[0],user[1]);
-                            }}>Block</button></td>
-                            <td ><button id="button-delete" onClick={async()=>{
-                                await DeleteUser(user[0],user[1]);
-                            }}>Delete</button></td>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>OE Number</th>
+                            <th>Register Date</th>
+                            <th id="ngr"></th>
                         </tr>
-                    </>
-                )}
 
-            </table>:
-            <h1 id="no-users">No Users Registered</h1>
-        }
+                        {enabledlist.map((user) =>
+                            <>
+                                <tr>
+                                    <td>{user[1].FirstName}</td>
+                                    <td>{user[1].LastName}</td>
+                                    <td>{user[1].Email}</td>
+                                    <td>{user[1].OENumber}</td>
+                                    <td>{user[1].RegisterDate}</td>
+                                    <td ><button id="button-allow" onClick={async()=>{
+                                        await UpdateUser(user[0],user[1]);
+                                    }}>Allow</button></td>
+                                    <td ><button id="button-delete" onClick={async()=>{
+                                        await DeleteUser(user[0],user[1]);
+                                    }}>Delete</button></td>
+                                </tr>
+                            </>
+                        )}
 
+                    </table>:
+                    <h1 id="no-users">No Users to activate</h1>
+                }
+                <h2 id="table_title">Active Users</h2>
+                {disabledlist && disabledlist.length ?
+                    <table id="bixo-table">
+                        <tr>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>OE Number</th>
+                            <th>RegisterDate</th>
+                            <th id="ngr"></th>
+                        </tr>
+
+                        {disabledlist.map((user) =>
+                            <>
+                                <tr>
+                                    <td>{user[1].FirstName}</td>
+                                    <td>{user[1].LastName}</td>
+                                    <td>{user[1].Email}</td>
+                                    <td>{user[1].OENumber}</td>
+                                    <td>{user[1].RegisterDate}</td>
+                                    <td ><button id="button-allow" onClick={async()=>{
+                                        await UpdateUser_disable(user[0],user[1]);
+                                    }}>Block</button></td>
+                                    <td ><button id="button-delete" onClick={async()=>{
+                                        await DeleteUser(user[0],user[1]);
+                                    }}>Delete</button></td>
+                                </tr>
+                            </>
+                        )}
+
+                    </table>:
+                    <h1 id="no-users">No Users Registered</h1>
+                }
+            </div>
         </div>
-
     );
 }
 

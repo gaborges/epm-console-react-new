@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
-import { createUserWithEmailAndPassword , 
-  signInWithEmailAndPassword , 
-  onAuthStateChanged, 
+import { createUserWithEmailAndPassword ,
+  signInWithEmailAndPassword ,
+  onAuthStateChanged,
   signOut } from "firebase/auth";
 import {auth} from  "./fire"
 import Login from "./Login"
@@ -16,7 +16,6 @@ function App() {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [hasAccount, setHasAccount] = useState("");
-
 
   const clearInputs = () => {
     setEmail("");
@@ -52,7 +51,7 @@ function App() {
         }
       });
   }
-  
+
   const handleSignUp = async () =>{
 
     await createUserWithEmailAndPassword(auth, email, password)
@@ -95,24 +94,25 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
-      {user ? (
-        <Hero 
-          handleLogout={handleLogout}/>
-      ):(
-        <Login 
-          email={email}
-          setEmail={setEmail}
-          password={password}
-          setPassword={setPassword}
-          handleLogin={handleLogin}
-          handleLogout={handleLogout}
-          handleSignUp={handleSignUp}
-          hasAccount={hasAccount}
-          setHasAccount={setHasAccount}
-          emailError={emailError}
-          passwordError={passwordError} />
-      )}
+      <div className="App">
+
+        {user ? (
+          <Hero
+            handleLogout={handleLogout}/>
+        ):(
+          <Login
+            email={email}
+            setEmail={setEmail}
+            password={password}
+            setPassword={setPassword}
+            handleLogin={handleLogin}
+            handleLogout={handleLogout}
+            handleSignUp={handleSignUp}
+            hasAccount={hasAccount}
+            setHasAccount={setHasAccount}
+            emailError={emailError}
+            passwordError={passwordError} />
+        )}
     </div>
   );
 }

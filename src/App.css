@@ -199,3 +199,50 @@ table th,td {
     transform: rotate(360deg);
   }
 }
+
+.loader {
+  position: absolute;
+  top: calc(50% - 4em);
+  left: calc(50% - 4em);
+  width: 6em;
+  height: 6em;
+  border: 1.1em solid #8a8c91b3;
+  border-left: 1.1em solid #fff;
+  border-radius: 50%;
+  animation: load8 1.1s infinite linear;
+  transition: opacity 0.3s;
+}
+
+.loader--hide {
+  opacity: 0;
+}
+
+@keyframes load8 {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+#overlay-background {
+  background-color: #00000033;
+  width: 100%;
+  top: 0;
+  height: 100%;
+  position: absolute;
+}
+.overlay-background-hide {
+  display: none;
+}
+
+.text-loading{
+  text-align: center;
+  top: calc(40% - 4em);
+  position: absolute;
+  left: calc(44% - 4em);
+  color: white;
+  font-size: 20px;
+  width: 300px;
+}
