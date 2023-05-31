@@ -84,46 +84,15 @@ function UserList(props) {
     async function DeleteUser(userid,user){
         console.log("delete_user_func->" + userid);
         //document.querySelector
-        if (window.confirm('Are you sure you wish to delete this item?\n\nWarning: be aware that if you just activated the web service, the first deleted user action takes nearly 1 minute because the firebase must load all libraries and verify the authenticity from the SDK access.'))
+
+        //if (window.confirm('Are you sure you wish to delete this item?\n\nWarning: be aware that if you just activated the web service, the first deleted user action takes nearly 1 minute because the firebase must load all libraries and verify the authenticity from the SDK access.'))
+        if (window.confirm('Are you sure you wish to delete this item?'))
         {
-            //const loader = document.querySelector('#overlay-background');// if you want to show the loader when React loads data again
-            //const loader = document.getElementById("overlay-background");// if you want to show the loader when React loads data again
-            //const showLoader = () => loader.classList.remove('overlay-background-hide');
-            setEnableLoading(true);
-            console.log("Ação deletar: Resgata utilizador")
-
-            console.log(user);
-
-            var data = JSON.stringify({
-                'id': userid,
-                'email': user.Email
-            });
-
-            await fetch('http://localhost:5000/delete_user', {
-                method: 'POST',
-                body: data,
-                headers: {
-                    'Content-type': 'application/json; charset=UTF-8',
-                },
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    console.log("result data: "+data);
-                    console.log("Pronto, excluído")
-                    //setPosts((posts) => [data, ...posts]);
-                    //setTitle('');
-                    //setBody('');
-                    //const hideLoader = () => loader.classList.add('overlay-background-hide');
-                    setEnableLoading(false);
-                })
-                .catch((err) => {
-                    console.log(err.message);
-                    setEnableLoading(false);
-                });
-
-            console.log("Teste ação");
-        } else {
-            console.log("Cancelar ação");
+            // console.log("delete_user_func->" + userid);
+            //signOut(auth);
+            //await signInWithEmailAndPassword(auth, user.email,user.password).user.delete();
+            const db = getDatabase();
+            await remove(ref(db, 'Users/' + userid));
         }
         props.func();
     }
